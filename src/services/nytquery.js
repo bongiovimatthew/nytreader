@@ -1,24 +1,32 @@
 class NYTAPI {
-    static async getNytData() {
+    static async beginGetData(dataCallback) {
         
         let numResults = 0;
-        let allArticles = [];
         const firstResponse = await NYTAPI.getOffsetData(0);
 
         if(firstResponse.status === "OK"){
             numResults = firstResponse.num_results;
             console.log(`NumResults: ${numResults}`);
-            allArticles = allArticles.concat(firstResponse.results);
+            dataCallback(firstResponse.results)
 
             console.log(firstResponse.results);
 
             const pages = Math.ceil(numResults / 20.0);
             console.log(`numpages: ${pages}`);
-            // allArticles.concat([...Array(pages-5).keys()].map((item, index) => NYTAPI.getOffsetData(index+1)));
+
+            for (var i=1; i < pages; i += 1) {
+                const data = await NYTAPI.getOffsetData(i);
+                dataCallback(data.results);
+                console.log(data);                
+            }
+
+            /* [...Array(pages).keys()].map((item, index) => {
+                return NYTAPI.getOffsetData(index+1).then(results => {
+                    dataCallback(results.results);
+                    console.log(results);
+                });
+            });*/
         }
-        
-        console.log(allArticles);
-        return allArticles;
     };
 
     static sleep(ms) {
@@ -26,19 +34,17 @@ class NYTAPI {
     }
 
     static async getOffsetData(offset){
-        await NYTAPI.sleep(2000);
-        console.log("getOffset");
+        await NYTAPI.sleep(6000);
+        console.log(`getOffset: ${offset}`);
         const source = 'all';
         const section = 'all';
-        const timePeriod = 48;
+        const timePeriod = 24;
     
         // TODO: move to .env
         const apiKey = process.env.REACT_APP_NYT_API_KEY;
-
-        console.log(process.env);
-
         const requestUri = `https://api.nytimes.com/svc/news/v3/content/${source}/${section}/${timePeriod}.json?api-key=${apiKey}&limit=20&offset=${offset}`;
         const response = await fetch(requestUri);
+        console.log(`Request: ${requestUri}`);
         return response.json();
     }
 };

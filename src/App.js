@@ -9,32 +9,45 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: []
+      data: [],
+      slugs: []
     };
   }
 
   componentDidMount() {
-    this.getData().then(data => {
-      const simpleData = data.map((item, index) => ({
-        key: `${index}`,
-        url: `${item.url}`,
-        published: `${item.published_date}`,
-        title: `${item.title}`,
-        byline: `${item.byline}`,
-        subheadline: `${item.subheadline}`,
-        item_type: `${item.item_type}`
-      }));
-  
-      this.setState({data: simpleData});      
-    });
+    this.getData();
   }
 
-  async getData() {
-    const results = await NYTAPI.getNytData();
-    console.log(results);
-    // abstract, url, title, subheadline, byline, item_type, section, subsection, published_date 
-    return results;
+  getData() {
+    this.moreDataCallback = this.moreDataCallback.bind(this);
+    NYTAPI.beginGetData(this.moreDataCallback);
   };
+
+  moreDataCallback(data){
+    const simpleData = data.map((item, index) => ({
+      key: `${index}`,
+      slug: `${item.slug_name}`,
+      url: `${item.url}`,
+      published: `${item.published_date}`,
+      title: `${item.title}`,
+      byline: `${item.byline}`,
+      subheadline: `${item.subheadline}`,
+      item_type: `${item.item_type}`
+    }));
+
+    let temp = this.state.data;
+    simpleData.map(item => {
+      if(!(item in temp)) {
+        return temp.push(item);
+      }
+      return null;
+    });
+
+    this.setState(previousState => ({
+      data: temp.concat(previousState.data),
+    }));
+
+  }
 
   handleListItemClick(event, index){
     console.log(`Clicked item: ${index}`);
