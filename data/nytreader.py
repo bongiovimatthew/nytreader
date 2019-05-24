@@ -34,7 +34,7 @@ def getData(page, start, end, save, apikey):
         saveData(data)
     return data['response']['meta']['hits']
 
-apikey = os.getenv("NYT_API_KEY")
+apikey = os.getenv("REACT_APP_NYT_API_KEY")
 
 start = '20190522'
 getRange = getData(0, start, start, False, apikey)
