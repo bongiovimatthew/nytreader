@@ -5,8 +5,6 @@ import NYTAPI from './services/nytquery';
 // import ListItem from '@material-ui/core/ListItem';
 // import ListItemText from '@material-ui/core/ListItemText';
 
-require('dotenv').config()
-
 class App extends React.Component {
   constructor(props) {
     super(props);

@@ -33,7 +33,7 @@ class NYTAPI {
         const timePeriod = 48;
     
         // TODO: move to .env
-        const apiKey = process.env.NYT_API_KEY;
+        const apiKey = process.env.REACT_APP_NYT_API_KEY;
 
         console.log(process.env);
 
