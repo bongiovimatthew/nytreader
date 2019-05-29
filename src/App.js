@@ -12,6 +12,7 @@ class App extends React.Component {
     this.state = {
       data: [],
       slugs: [],
+      readSlugs: [],
       articlesToLoad: 0,
       isFetching: true
     };
@@ -118,8 +119,14 @@ class App extends React.Component {
     this.setState({ data: tempData, slugs: tempSlugs });
   }
 
-  handleListItemClick(event, index){
-    console.log(`Clicked item: ${index}`);
+  handleListItemClick(item){
+    console.log(`Clicked item:`);
+    console.log(item.slug);
+    const temp = this.state.readSlugs;
+    if (!temp.includes(item.slug)){
+      temp.push(item.slug);
+      this.setState({readSlugs: temp});
+    }
   };
   
   render() {
@@ -131,9 +138,9 @@ class App extends React.Component {
       </div>     
       <ul className="Article-list">
       {this.state.data.map((item, index) => (
-        <li className="Article-item" key={index}>
+        <li className="Article-item" key={index} onClick={this.handleListItemClick.bind(this, item)}>
           {index+1}
-
+          {this.state.readSlugs.includes(item.slug) ? "Read" : null}
           <a className="Article-item" href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a>
           {item.published.toString()}
           <br />
@@ -141,7 +148,7 @@ class App extends React.Component {
           <br />
           {item.wordCount + ' words (about ' + Math.ceil(item.wordCount / 225) + ' minutes)'}
         </li>
-      ))}
+      ), this)}
       </ul>
     </div>);
   }
