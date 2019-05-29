@@ -47,7 +47,7 @@ class NYTAPI {
     }
 
     static async getOffsetData_archive(offset){
-        await NYTAPI.sleep(6000);
+        await NYTAPI.sleep(process.env.REACT_APP_SLEEP_TIME_MS);
         console.log(`getOffset_archive: ${offset}`);
     
         const end = new Date();
@@ -61,7 +61,7 @@ class NYTAPI {
     }
 
     static async getOffsetData(offset){
-        await NYTAPI.sleep(6000);
+        await NYTAPI.sleep(process.env.REACT_APP_SLEEP_TIME_MS);
         console.log(`getOffset: ${offset}`);
         const source = 'all';
         const section = 'all';

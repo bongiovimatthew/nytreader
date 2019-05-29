@@ -1,10 +1,9 @@
 import React from 'react';
 import './App.css';
 import NYTAPI from './services/nytquery';
-// import List from '@material-ui/core/List';
-// import ListItem from '@material-ui/core/ListItem';
-// import ListItemText from '@material-ui/core/ListItemText';
+import MockNYTAPI from './services/nytquery_mock';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import ArticleTile from './components/ArticleTile';
 
 class App extends React.Component {
   constructor(props) {
@@ -12,7 +11,7 @@ class App extends React.Component {
     this.state = {
       data: [],
       slugs: [],
-      readSlugs: [],
+      readSlugs: localStorage.getItem('readSlugs') || [],
       articlesToLoad: 0,
       isFetching: true
     };
@@ -23,10 +22,8 @@ class App extends React.Component {
   }
 
   getData() {
-    // this.moreDataCallback = this.moreDataCallback.bind(this);
-    // NYTAPI.beginGetData(this.moreDataCallback);
-
     this.moreDataCallback_archive = this.moreDataCallback_archive.bind(this);
+    // MockNYTAPI.beginGetData_archive(this.moreDataCallback_archive);
     NYTAPI.beginGetData_archive(this.moreDataCallback_archive);
   };
 
@@ -56,7 +53,7 @@ class App extends React.Component {
       byline: item.byline.original == null ? "" : `${item.byline.original}`,
       subheadline: `${item.abstract}`,
       item_type: `${item.document_type}`,
-      wordCount: `${item.word_count}`
+      wordCount: item.word_count
     }));
 
     const tempData = this.state.data;
@@ -126,7 +123,23 @@ class App extends React.Component {
     if (!temp.includes(item.slug)){
       temp.push(item.slug);
       this.setState({readSlugs: temp});
+      localStorage.setItem('readSlugs', this.state.readSlugs);
     }
+    window.open(item.url);
+  };
+
+  getTimeRemaining() {
+    let wordCountRemaining = 0.0;
+    this.state.data.forEach(element => {
+      if (!this.state.readSlugs.includes(element.slug)){
+        wordCountRemaining += element.wordCount;
+      }
+    });
+
+    const totalMinsRemaining = Math.ceil(wordCountRemaining / 225);
+    const hoursRemaining = Math.floor(totalMinsRemaining / 60);
+    const minsRemaining = Math.ceil(totalMinsRemaining - (hoursRemaining * 60));
+    return `${hoursRemaining} hrs ${minsRemaining} mins`;
   };
   
   render() {
@@ -134,20 +147,20 @@ class App extends React.Component {
       <div className="Loading">
         <div>Total Articles: {this.state.articlesToLoad}</div>
         <div>Articles Loaded: {this.state.slugs.length}</div>
+        <div>Articles Remaining: {this.state.slugs.length - this.state.readSlugs.length}</div>
+        <div>Time Remaining: {this.getTimeRemaining()}</div>
         {this.state.isFetching && <CircularProgress />}
-      </div>     
+      </div>    
+      <button onClick={() => localStorage.clear()}>Clear Local Storage</button> 
       <ul className="Article-list">
       {this.state.data.map((item, index) => (
-        <li className="Article-item" key={index} onClick={this.handleListItemClick.bind(this, item)}>
-          {index+1}
-          {this.state.readSlugs.includes(item.slug) ? "Read" : null}
-          <a className="Article-item" href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a>
-          {item.published.toString()}
-          <br />
-          {item.byline}
-          <br />
-          {item.wordCount + ' words (about ' + Math.ceil(item.wordCount / 225) + ' minutes)'}
-        </li>
+        <ArticleTile 
+          key={item.slug} 
+          index={index} 
+          item={item} 
+          handleListItemClick={this.handleListItemClick.bind(this, item)} 
+          read={this.state.readSlugs.includes(item.slug)} 
+        />
       ), this)}
       </ul>
     </div>);
