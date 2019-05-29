@@ -11,7 +11,7 @@ class App extends React.Component {
     this.state = {
       data: [],
       slugs: [],
-      readSlugs: localStorage.getItem('readSlugs') || [],
+      readSlugs: JSON.parse(localStorage.getItem('readSlugs')) || [],
       articlesToLoad: 0,
       isFetching: true
     };
@@ -123,7 +123,7 @@ class App extends React.Component {
     if (!temp.includes(item.slug)){
       temp.push(item.slug);
       this.setState({readSlugs: temp});
-      localStorage.setItem('readSlugs', this.state.readSlugs);
+      localStorage.setItem('readSlugs', JSON.stringify(this.state.readSlugs));
     }
     window.open(item.url);
   };
@@ -152,6 +152,7 @@ class App extends React.Component {
         {this.state.isFetching && <CircularProgress />}
       </div>    
       <button onClick={() => localStorage.clear()}>Clear Local Storage</button> 
+      <button onClick={() => this.getData()}>Refresh</button> 
       <ul className="Article-list">
       {this.state.data.map((item, index) => (
         <ArticleTile 
