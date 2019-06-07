@@ -15,6 +15,7 @@ class App extends React.Component {
       articlesToLoad: 0,
       isFetching: true
     };
+    this.NYTAPI = new NYTAPI();
   }
 
   componentDidMount() {
@@ -24,7 +25,7 @@ class App extends React.Component {
   getData() {
     this.moreDataCallback_archive = this.moreDataCallback_archive.bind(this);
     // MockNYTAPI.beginGetData_archive(this.moreDataCallback_archive);
-    NYTAPI.beginGetData_archive(this.moreDataCallback_archive);
+    this.NYTAPI.beginGetData_archive(this.moreDataCallback_archive);
   };
 
   async getArticleData(url){
