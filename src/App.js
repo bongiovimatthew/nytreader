@@ -2,8 +2,10 @@ import React from 'react';
 import './App.css';
 import NYTAPI from './services/nytquery';
 import MockNYTAPI from './services/nytquery_mock';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import ArticleTile from './components/ArticleTile';
+import HeaderBlock from './components/HeaderBlock';
+import List from '@material-ui/core/List';
+import 'typeface-roboto';
 
 class App extends React.Component {
   constructor(props) {
@@ -24,7 +26,7 @@ class App extends React.Component {
 
   getData() {
     this.moreDataCallback_archive = this.moreDataCallback_archive.bind(this);
-    // MockNYTAPI.beginGetData_archive(this.moreDataCallback_archive);
+    //MockNYTAPI.beginGetData_archive(this.moreDataCallback_archive);
     this.NYTAPI.beginGetData_archive(this.moreDataCallback_archive);
   };
 
@@ -145,16 +147,16 @@ class App extends React.Component {
   
   render() {
     return (<div className="App">
-      <div className="Loading">
-        <div>Total Articles: {this.state.articlesToLoad}</div>
-        <div>Articles Loaded: {this.state.slugs.length}</div>
-        <div>Articles Remaining: {this.state.slugs.length - this.state.readSlugs.length}</div>
-        <div>Time Remaining: {this.getTimeRemaining()}</div>
-        {this.state.isFetching && <CircularProgress />}
-      </div>    
+      <HeaderBlock 
+        articlesToLoad={this.state.articlesToLoad} 
+        slugs={this.state.slugs} 
+        readSlugs={this.state.readSlugs} 
+        timeRemaining={this.getTimeRemaining()}
+        isFetching={this.state.isFetching}
+      />    
       <button onClick={() => localStorage.clear()}>Clear Local Storage</button> 
       <button onClick={() => this.getData()}>Refresh</button> 
-      <ul className="Article-list">
+      <List className="Article-list">
       {this.state.data.map((item, index) => (
         <ArticleTile 
           key={item.slug} 
@@ -164,7 +166,7 @@ class App extends React.Component {
           read={this.state.readSlugs.includes(item.slug)} 
         />
       ), this)}
-      </ul>
+      </List>
     </div>);
   }
 }
