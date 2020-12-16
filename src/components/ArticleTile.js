@@ -20,7 +20,6 @@ class ArticleTile extends Component {
         <Paper
           onClick={this.props.handleListItemClick}
           elevation={elevation}
-          classes={{ root: { background: 'grey' } }}
           className="Article-tile">
           <Typography variant="h5" component="h3">{this.props.item.title}</Typography>
           <Typography component="h4">{this.props.item.byline}</Typography>
@@ -28,7 +27,6 @@ class ArticleTile extends Component {
           <Typography component="p">{this.props.item.wordCount + ' words (about ' + Math.ceil(this.props.item.wordCount / 225) + ' minutes)'}</Typography>
         </Paper>
         <Paper
-          classes={{ root: { background: 'grey' } }}
           className="Article-checkbox">
           <FormGroup row>
             <FormControlLabel
