@@ -171,11 +171,11 @@ class Application extends Component {
 
   render() {
     return (
-      !this.user ?
+      this.user ?
         <SignIn></SignIn>
         :
         <div className="App">
-          The user is: {this.user.email}
+          The user is: 
           <HeaderBlock
             articlesToLoad={this.state.articlesToLoad}
             slugs={this.state.slugs}
