@@ -64,6 +64,7 @@ class NYTAPI {
         const startStr = `${end.getFullYear()}${("0" + (end.getMonth() + 1)).slice(-2)}${end.getDate()}`
 
         const apiKey = process.env.REACT_APP_NYT_API_KEY;
+        // fq=source%3A"The%20New%20York%20Times"&sort=newest
         const requestUri = `https://api.nytimes.com/svc/search/v2/articlesearch.json?begin_date=${startStr}&end_date=${startStr}&api-key=${apiKey}&fq=source:("The New York Times")&page=${offset}`;
         const response = await fetch(requestUri);
         console.log(`Request: ${requestUri}`);

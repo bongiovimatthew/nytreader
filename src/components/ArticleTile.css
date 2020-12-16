@@ -9,7 +9,7 @@
     margin-bottom: 5px; */
     padding: 16px;
     text-align: center;
-    width:100%;
+    width:85%;
     margin: auto;
     align-content: center;
 }
@@ -34,4 +34,10 @@
     cursor: pointer;
 }
 
-
+.Article-checkbox {
+    padding: 16px;
+    text-align: center;
+    width:15%;
+    margin: auto;
+    align-content: center;
+}
