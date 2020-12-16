@@ -1,0 +1,15 @@
+.App {
+  text-align: center;
+  /* background: #49494b; */
+  background: #F5F5F5;
+  height: 100%;
+  margin: auto;
+}
+
+.Article-list {
+  overflow: hidden;
+  width: 100%;
+  align-content: center;
+  background: #F5F5F5;
+  margin-left:80px;
+}

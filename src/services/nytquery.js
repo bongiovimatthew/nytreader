@@ -1,44 +1,73 @@
 class NYTAPI {
-    static async getNytData() {
+    constructor(){
+        this.RequestTimes = JSON.parse(localStorage.getItem('requestTimes')) || [];
+    }
+
+    async beginGetData_archive(dataCallback){
         
         let numResults = 0;
-        let allArticles = [];
-        const firstResponse = await NYTAPI.getOffsetData(0);
+        const firstResponse = await this.getOffsetData_archive(0);
 
         if(firstResponse.status === "OK"){
-            numResults = firstResponse.num_results;
+            numResults = firstResponse.response.meta.hits;
             console.log(`NumResults: ${numResults}`);
-            allArticles = allArticles.concat(firstResponse.results);
+            const pages = Math.ceil(numResults / 10.0);
 
-            console.log(firstResponse.results);
-
-            const pages = Math.ceil(numResults / 20.0);
+            dataCallback(firstResponse.response, pages - 1);
             console.log(`numpages: ${pages}`);
-            // allArticles.concat([...Array(pages-5).keys()].map((item, index) => NYTAPI.getOffsetData(index+1)));
+
+            for (var i=1; i < pages; i += 1) {
+                const data = await this.getOffsetData_archive(i);
+                dataCallback(data.response, pages - 1 - i);
+                console.log(data);                
+            }
         }
-        
-        console.log(allArticles);
-        return allArticles;
     };
+
+
 
     static sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    static async getOffsetData(offset){
-        await NYTAPI.sleep(2000);
-        console.log("getOffset");
-        const source = 'all';
-        const section = 'all';
-        const timePeriod = 48;
+    cleanThrottleCounter(){
+        const oldest = new Date().getTime() - 60000;
+        // Remove any items that are older than 1 minute
+        this.RequestTimes = this.RequestTimes.filter(function(value){
+            return value > oldest;
+        });
+
+        localStorage.setItem('requestTimes', JSON.stringify(this.RequestTimes));
+    }
+
+    async throttleIfNeeded(){
+        if (this.RequestTimes.length >= 20){
+            // We have made at least 20 requests in the last 1 minute, 
+            //  and our max is 30 in a minute, so we need to throttle
+            //  incoming requests
+
+            console.log("THROTTLING!");
+
+            await NYTAPI.sleep(parseInt(process.env.REACT_APP_SLEEP_TIME_THROTTLED_MS));
+        }
+
+        this.RequestTimes.push(new Date().getTime());
+        this.cleanThrottleCounter();
+        return;
+    }
+
+    async getOffsetData_archive(offset){
+        await this.throttleIfNeeded();
+        console.log(`getOffset_archive: ${offset}`);
     
-        // TODO: move to .env
+        const end = new Date();
+        const startStr = `${end.getFullYear()}${("0" + (end.getMonth() + 1)).slice(-2)}${end.getDate()}`
+
         const apiKey = process.env.REACT_APP_NYT_API_KEY;
-
-        console.log(process.env);
-
-        const requestUri = `https://api.nytimes.com/svc/news/v3/content/${source}/${section}/${timePeriod}.json?api-key=${apiKey}&limit=20&offset=${offset}`;
+        // fq=source%3A"The%20New%20York%20Times"&sort=newest
+        const requestUri = `https://api.nytimes.com/svc/search/v2/articlesearch.json?begin_date=${startStr}&end_date=${startStr}&api-key=${apiKey}&fq=source:("The New York Times")&page=${offset}`;
         const response = await fetch(requestUri);
+        console.log(`Request: ${requestUri}`);
         return response.json();
     }
 };
