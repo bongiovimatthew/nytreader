@@ -31,7 +31,6 @@ class ArticleTile extends Component {
           <FormGroup row>
             <FormControlLabel
               control={<Checkbox icon={<StarBorder />} checkedIcon={<Star />} name="problem" />}
-              label="My problem"
               onChange={this.props.handleCheckBoxChange}
             />
           </FormGroup>
