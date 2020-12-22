@@ -4,7 +4,6 @@ class NYTAPI {
     }
 
     async beginGetData_archive(dataCallback){
-        
         let numResults = 0;
         const firstResponse = await this.getOffsetData_archive(0);
 
@@ -23,8 +22,6 @@ class NYTAPI {
             }
         }
     };
-
-
 
     static sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -45,9 +42,6 @@ class NYTAPI {
             // We have made at least 20 requests in the last 1 minute, 
             //  and our max is 30 in a minute, so we need to throttle
             //  incoming requests
-
-            console.log("THROTTLING!");
-
             await NYTAPI.sleep(parseInt(process.env.REACT_APP_SLEEP_TIME_THROTTLED_MS));
         }
 
@@ -58,16 +52,15 @@ class NYTAPI {
 
     async getOffsetData_archive(offset){
         await this.throttleIfNeeded();
-        console.log(`getOffset_archive: ${offset}`);
     
         const end = new Date();
-        const startStr = `${end.getFullYear()}${("0" + (end.getMonth() + 1)).slice(-2)}${end.getDate()}`
+        const startStr = `${end.getFullYear()}-${("0" + (end.getMonth() + 1)).slice(-2)}-${end.getDate()}`
 
         const apiKey = process.env.REACT_APP_NYT_API_KEY;
         // fq=source%3A"The%20New%20York%20Times"&sort=newest
-        const requestUri = `https://api.nytimes.com/svc/search/v2/articlesearch.json?begin_date=${startStr}&end_date=${startStr}&api-key=${apiKey}&fq=source:("The New York Times")&page=${offset}`;
+        const requestUri = `https://api.nytimes.com/svc/search/v2/articlesearch.json?api-key=${apiKey}&fq=source:(%22The%20New%20York%20Times%22)%20AND%20pub_date:${startStr}&page=${offset}`
+        // const requestUri = `https://api.nytimes.com/svc/search/v2/articlesearch.json?begin_date=${startStr}&end_date=${startStr}&api-key=${apiKey}&fq=source:("The New York Times")&page=${offset}`;
         const response = await fetch(requestUri);
-        console.log(`Request: ${requestUri}`);
         return response.json();
     }
 };
