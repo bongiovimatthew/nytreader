@@ -26,11 +26,23 @@ class Application extends Component {
     this.NYTAPI = new NYTAPI();
   }
 
-  componentWillUpdate(nextProps, nextState, nextContext) {
+  async componentWillUpdate(nextProps, nextState, nextContext) {
     this.user = nextContext;
     if (this.user && !this.state.isFetching && !this.state.didFetch) {
-      this.getData();
-      this.setState({ didFetch: true });
+      db.collection('users')
+        .where('user_id', '==', this.user.uid)
+        .get()
+        .then(querySnapshot => {
+          const data = querySnapshot.docs.map(doc => doc.data());
+          if (data && data[0] && data[0].api_key) {
+            this.NYTAPI.init(data[0].api_key);
+            this.getData();
+            this.setState({ didFetch: true });
+          } else {
+            // Could not get api key for user
+            console.error('Error: no API key exists for user: ' + this.user.uid);
+          }
+        });
     }
   }
 
@@ -131,8 +143,6 @@ class Application extends Component {
   }
 
   handleListItemClick(item) {
-    console.log(`Clicked item:`);
-    console.log(item.slug);
     const temp = this.state.readSlugs;
     if (!temp.includes(item.slug)) {
       temp.push(item.slug);
@@ -143,8 +153,6 @@ class Application extends Component {
   };
 
   handleCheckBoxChange(item, event) {
-    console.log('check changed');
-    console.log();
     const tags = event.target.checked ? ['my_problem'] : [];
     db.collection('articles')
       .add({
