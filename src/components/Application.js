@@ -7,6 +7,7 @@ import ArticleTile from './ArticleTile';
 import HeaderBlock from './HeaderBlock';
 import SignIn from './SignIn';
 import List from '@material-ui/core/List';
+import Button from '@material-ui/core/Button';
 import { UserContext } from '../providers/UserProvider';
 import { db } from '../firebase';
 
@@ -191,8 +192,8 @@ class Application extends Component {
             timeRemaining={this.getTimeRemaining()}
             isFetching={this.state.isFetching}
           />
-          <button onClick={() => localStorage.clear()}>Clear Local Storage</button>
-          <button onClick={() => this.getData()}>Refresh</button>
+          <Button variant="contained" onClick={() => localStorage.clear()}>Clear Local Storage</Button>
+          <Button variant="contained" onClick={() => this.getData()}>Refresh</Button>
           <List className="Article-list">
             {this.state.data.map((item, index) => (
               <ArticleTile
